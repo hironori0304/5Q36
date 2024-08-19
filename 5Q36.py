@@ -200,24 +200,26 @@ if uploaded_file is not None:
     if st.button('不正解問題（ハイライト表示）'):
         st.session_state.highlighted_questions = st.session_state.incorrect_questions
 
-# 回答履歴表示
+# セッションステートから名前を取得し、デフォルト値に設定
+if 'user_name' not in st.session_state:
+    st.session_state.user_name = ""
+
+# 回答履歴がセッションステートに存在する場合
 if 'results_history' in st.session_state and st.session_state.results_history:
     st.write("回答履歴:")
     history_df = pd.DataFrame(st.session_state.results_history)
     st.write(history_df)
     
     # ユーザー名の入力フィールドを追加
-    user_name = st.text_input("名前を入力してください", "")
+    st.session_state.user_name = st.text_input("名前を入力してください", st.session_state.user_name)
     
-    # 現在の日本時間を取得
+        # 現在の日本時間を取得
     tokyo_tz = pytz.timezone('Asia/Tokyo')
     now = datetime.now(tokyo_tz).strftime('%Y%m%d_%H%M%S')
     
-    # ファイル名にユーザー名を追加
-    if user_name:
-        file_name = f"{user_name}_回答履歴_{now}.csv"
-    else:
-        file_name = f"回答履歴_{now}.csv"
+   # ファイル名にユーザー名を追加
+    file_name = f"{st.session_state.user_name}_回答履歴_{now}.csv" if st.session_state.user_name else f"回答履歴_{now}.csv"
+    
     
     # CSVファイルを生成
     csv = history_df.to_csv(index=False).encode('utf-8-sig')
